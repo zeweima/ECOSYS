@@ -2,11 +2,6 @@
       Module NUM_VARIBELS
       contains
       Function f_numbervars(vars) result(numvars)
-c      character(len=*), intent(in) :: vars
-c      INTEGER numvars
-c      CHARACTER*len(vars) tmpvars
-c      character*100 tmpvar
-c      tmpvars = trim(adjustl(vars))
 
       character(len=*), intent(in) :: vars
       integer :: numvars
@@ -27,6 +22,7 @@ c      tmpvars = trim(adjustl(vars))
 C
 C     THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
 C
+      USE NUM_VARIBELS
       include "parameters.h"
       include "filec.h"
       include "files.h"
@@ -37,8 +33,7 @@ C
       include "blk8a.h"
       include "blk8b.h"
       include "blk17.h"
-      include "blk11a.h"
-      USE NUM_VARIBELS
+      include "blk11a.h"     
       DIMENSION NA(10),ND(10),NM(JY,JX),DHI(JX),DVI(JY)
       CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
      2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
@@ -83,6 +78,8 @@ ccccccccccccccccccccccccccccccccccccccccccc
       READ(1,*)OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG
       READ(1,*)IETYPG,ISALTG,IERSNG,NCNG,DTBLIG,DTBLDIG,DTBLGG
 c     zma changes 20200206 cccccccccccccccc
+c     The current version only fit for the situation where the water
+c     only be drained out from one side of the soil column.
       IF (NumCol.gt.13.1)THEN
       READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG 
      2,RCHGWUG,RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG,TTILED
@@ -90,6 +87,7 @@ c     zma changes 20200206 cccccccccccccccc
       ELSE
       READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG 
      2,RCHGWUG,RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
+      TILED=MAX(RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG)
       ENDIF
 c      READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG
 c     2,RCHGWUG,RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
