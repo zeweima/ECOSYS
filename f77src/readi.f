@@ -1,3 +1,25 @@
+      Module NUM_VARIBELS
+      contains
+      Function f_numbervars(vars) result(numvars)
+c      character(len=*), intent(in) :: vars
+c      INTEGER numvars
+c      CHARACTER*len(vars) tmpvars
+c      character*100 tmpvar
+c      tmpvars = trim(adjustl(vars))
+
+      character(len=*), intent(in) :: vars
+      integer :: numvars
+      character(len=len(vars)) :: tmpvars
+      character(len=256) :: tmpvar
+      tmpvars = trim(adjustl(vars))
+      numvars = 0
+      DO WHILE (len_trim(tmpvars) > 0)
+      read(tmpvars, *) tmpvar
+      numvars = numvars + 1
+      tmpvars = tmpvars(index(tmpvars, trim(tmpvar))+len_trim(tmpvar):)
+      END DO            
+      END Function f_numbervars
+      END Module NUM_VARIBELS
 
       SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ
      2,NTZX,NHW,NHE,NVN,NVS)
@@ -15,6 +37,7 @@ C
       include "blk8b.h"
       include "blk17.h"
       include "blk11a.h"
+      USE NUM_VARIBELS
       DIMENSION NA(10),ND(10),NM(JY,JX),DHI(JX),DVI(JY)
       CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
      2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
@@ -25,6 +48,10 @@ C
       CHARACTER*4 CHARY
       CHARACTER*1 TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
       CHARACTER*80 PREFIX
+c     Zma changes 20220205 cccccccccccc
+      CHARACTER*200 Lines
+      integer NumCol
+ccccccccccccccccccccccccccccccccccccccc
       DIMENSION IDAT(20),DAT(50),DATK(50)
       PARAMETER (TWILGT=0.06976)
 C
@@ -44,11 +71,28 @@ C
 C
 C     READ SITE DATA
 C
+cc    Zma changes 20220206 cccccccccccccccc
+      DO I =1,4
+      READ(1, '(A190)') Lines
+      END DO
+      REWIND(1)
+      NumCol = f_numbervars( Lines)
+ccccccccccccccccccccccccccccccccccccccccccc
       READ(1,*)ALATG,ALTIG,ATCAG,IPRCG
       READ(1,*)OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG
       READ(1,*)IETYPG,ISALTG,IERSNG,NCNG,DTBLIG,DTBLDIG,DTBLGG
+c     zma changes 20200206 cccccccccccccccc
+      IF (NumCol.gt.13.1)THEN
+      READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG 
+     2,RCHGWUG,RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG,TTILED
+      TILED = TTILED
+      ELSE
       READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG 
      2,RCHGWUG,RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
+      ENDIF
+c      READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG 
+c     2,RCHGWUG,RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
+ccccccccccccccccccccccccccccccccccccccccccc
       READ(1,*)(DHI(NX),NX=1,NHE)
       READ(1,*)(DVI(NY),NY=1,NVS)
       CLOSE(1)
